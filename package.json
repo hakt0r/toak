@@ -26,7 +26,10 @@
     "redux": "^4.0.5",
     "uuid": "^7.0.2"
   },
+  "proxy": "http://localhost:3001",
   "scripts": {
+    "backend": "nodemon backend/index.js",
+    "devel": "concurrently \"npm start\" \"npm run backend\"",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
