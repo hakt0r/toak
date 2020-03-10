@@ -1,35 +1,28 @@
 
-import * as serviceWorker from './serviceWorker';
+import * as serviceWorker    from './serviceWorker';
 
-import React             from 'react';
-import ReactDOM          from 'react-dom';
-
-import { BrowserRouter, Route } from 'react-router-dom';
+import React                 from 'react';
+import ReactDOM              from 'react-dom';
+import { BrowserRouter }     from 'react-router-dom';
+import { Auth, authReducer } from './lib/auth'
+import { Provider }          from 'react-redux'
+import { createStore, combineReducers } from 'redux'
 
 import App from './App';
 
-function AuthSuccess(props){
-  window.token = props.match.params.token;
-  props.history.push('/');
-  return null;
-}
-
-// <input onChange={isidle}/>
-let timer = null;
-const isidle = ()=>{
-  clearTimeout(timer);
-  timer = setTimeout( ()=>{
-    console.log('idle!');
-  },500)
-}
-
+const store = createStore(
+  combineReducers({
+    auth: authReducer
+  })
+);
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Route path="/success/:token" component={AuthSuccess}/>
-    <input onChange={isidle}/>
-    <App/>
-  </BrowserRouter>
+  <Provider store={store}>
+    <BrowserRouter>
+      <Auth/>{/*This implements all the authentication logic*/}
+      <App/>
+    </BrowserRouter>
+  </Provider>
   , document.getElementById('root'));
 
 serviceWorker.register();

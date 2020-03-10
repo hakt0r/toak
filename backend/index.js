@@ -33,7 +33,13 @@ const bodyParser  = require("body-parser");
 const app = express();
 
 app.use(bodyParser.json());
-
+app.use(
+  (req,res,next)=> {
+    res.header( "Access-Control-Allow-Origin", "*" );
+    res.header( "Access-Control-Allow-Headers", "*" );
+    next();
+  }
+)
 /*
   Act 3: Setup Passport
 */
@@ -107,7 +113,7 @@ Object.keys(config.auth)
         //  - contains the clientID and clientSecret from config.auth[provider]
         ...Options,
         ...config.auth[provider],
-        callbackURL:`http://localhost:3001/auth/${provider}/callback`
+        callbackURL:`http://bing.com:3001/auth/${provider}/callback`
       },
       middleware // provide the middleware function we created above
   ));
@@ -126,7 +132,7 @@ Object.keys(config.auth)
     (req, res) => {
       const { email, name, id } = req.user;
       const token = jwt.sign({name,email,sub:id}, config.jwtSecret);
-      res.redirect(`http://localhost:3000/success/${token}`);
+      res.redirect(`http://bing.com:3000/success/${token}`);
     }
   );
 });
@@ -144,6 +150,15 @@ passport.deserializeUser(function (id, done) {
   User.findOne({authId:id}, function (err, user) {
     done(err, user);
   });
+});
+
+// add the /auth/check route using the
+// middleware in auth/check
+
+const ckeckAuth = require('./auth/check');
+
+app.post('/auth/check', ckeckAuth, (req,res)=>{
+  res.json({ success: true })
 });
 
 /*

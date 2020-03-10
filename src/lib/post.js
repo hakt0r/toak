@@ -1,4 +1,6 @@
 
+import packageJSON from '../package.json'
+
 const POST = window.POST = async (path = "", data = {}) => {
   const opts = {
     method: "POST",
@@ -13,7 +15,10 @@ const POST = window.POST = async (path = "", data = {}) => {
   };
   if ( POST.token ) opts.headers["X-Auth-Header"] = POST.token;
   try {
-    let result = await fetch(path, opts);
+    let result = await fetch(
+      packageJSON.backend + path,
+      opts
+    );
     return await result.json();
   } catch(e){
     return { success:false, message:e.toString() }
