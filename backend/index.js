@@ -152,9 +152,10 @@ passport.deserializeUser(function (id, done) {
   });
 });
 
-// add the /auth/check route using the
-// middleware in auth/check
-
+// add the /auth/check route using the middleware in auth/check
+//   - this is supposed to make sure a user is authenticated
+//     the frontend uses this route to verify a store token
+//     is still valid.
 const ckeckAuth = require('./auth/check');
 
 app.post('/auth/check', ckeckAuth, (req,res)=>{
