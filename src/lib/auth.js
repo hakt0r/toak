@@ -91,12 +91,17 @@ export const authActions = function( dispatch ){
       dispatch({ type:'auth:ok', token })
     },
     check: async function(token){
+      // first notify the state reducer that were checking the token
       dispatch({ type:'auth:check', token });
-      POST.token = token; // In order to try the token we need to add it to POST
+      // In order to try the token we need to add it to POST
+      POST.token = token;
+      // call the auth/check route, if our token is valid this should work
       const result = await POST('/auth/check');
       if ( result.success ){
+        // if it worked, this is the same as a successful login
         dispatch({ type:'auth:ok', token });
       } else {
+        // if it did not work, this is the same as a failed login
         dispatch({ type:'auth:fail', error:result.message });
       }
     },
@@ -108,6 +113,12 @@ export const authActions = function( dispatch ){
     }
 }}}
 
+/*
+  This component catches the JWT token after a successful login.
+   - The token is extracted from the URI using a route :param
+   - The auth.ok() action is used to notify the reducer, change the state
+   - Finally we redirect the user to the homepage.
+*/
 const AuthSuccess = connect( null, authActions )(
   function AuthSuccess(props){
     const { auth } = props;
@@ -117,6 +128,13 @@ const AuthSuccess = connect( null, authActions )(
     return null;
   }
 )
+
+/*
+  This component checks if a JWT-token exists ONCE after a page reload
+   - the [checkedForTokenAlready] variable blocks us from checking twice
+   - the auth.check() action is dispatched with the token
+   - everything else happens insid the dispatcher
+ */
 
 let checkedForTokenAlready = false;
 
@@ -129,6 +147,8 @@ const AuthCheck = connect( null, authActions )(
   }
 )
 
+// Bundle the logic components we wrote into one so we can
+//   include the auth logic in an easy way from index.js
 export function Auth(){
   return ( <>
     <AuthCheck/>
@@ -136,6 +156,7 @@ export function Auth(){
   </> )
 }
 
+// Generate login links for every authentication provider
 export function AuthLinks(){
   return providers.map(
     provider =>
